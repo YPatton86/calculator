@@ -7,13 +7,25 @@ const operators = [...calculator.querySelectorAll(".key--operator"), ...calculat
 const operatorList = {};
 operators.forEach(operator =>operatorList[operator.dataset.action] = operator.innerHTML);
 
+// class calculatorFunction {
+//     constructor(){
+//         this.answer = null;
+//         this.strNumber = "";
+//         this.previousOperator = "";
+//         //may not use
+//         this.operationBeforeCalculate = "";
+//         this.globalConvertNumber = null;
+//     }
+// }
 
-let answer = null;
+// new clickCalculator = new calculatorFunction();
+
+let answer = 0;
 let strNumber ="";
 let previousOperator = "";
 //may not use
 let operationBeforeCalculate = "";
-let globalConvertNumber= null;
+let globalConvertNumber= 0;
 
 keys.forEach(key=> {
     key.addEventListener('click', eventHandler);
@@ -47,7 +59,7 @@ function eventHandler(event){
 function numberManager(input){
     calculator.querySelector("button[data-action= 'clear']").innerHTML = "CE";
     strNumber = strNumber.concat(input);
-    
+
     // 0 typo handling (edge case)
     (strNumber === ".") && (strNumber = "0.");
     if (!Number(strNumber) && Number(strNumber) !== 0 || strNumber[0] === "0" && strNumber[1] !== ".") {
@@ -72,12 +84,12 @@ function ceAcManager(CEorAC){
 function clearOrError(clear=true){
     display.innerHTML = clear ? 0 : "err";
     displayMini.innerHTML = "Display Previous Entry";
-    answer = null;
+    answer = 0;
     strNumber = "";
     previousOperator = "";
     // may not use
     operationBeforeCalculate = "";
-    globalConvertNumber = null;
+    globalConvertNumber = 0;
 }
 
 //Operators section
@@ -87,17 +99,12 @@ function totalOperation(actionKey){
         if (strNumber === "") {
 
             (previousOperator !== "calculate") && (operationBeforeCalculate = previousOperator);
-            (previousOperator) && equalEdgeCases(previousOperator, actionKey);
+            (previousOperator) && equalsEdgeCases(previousOperator, actionKey);
             previousOperator = actionKey;
 
         } else {
-
-            const convertNumber = parseFloat(strNumber);
-            globalConvertNumber = convertNumber;
             //standard mathematical operation
-            answer = standardOperation(previousOperator, actionKey, answer, convertNumber);
-            display.innerHTML = answer;
-            strNumber = '';
+            standardOperation(actionKey);
             operationBeforeCalculate = previousOperator;
             previousOperator = actionKey;
 
@@ -127,7 +134,9 @@ function operationManager(previousOperator, answer, convertNumber) {
     }
 }
 
-function standardOperation(previousOperator, actionKey, answer, convertNumber) {
+function standardOperation(actionKey) {
+    const convertNumber = parseFloat(strNumber);
+    globalConvertNumber = convertNumber;
     if (previousOperator) {
 
         displayMini.innerHTML = (previousOperator !== "calculate") ? (
@@ -142,16 +151,15 @@ function standardOperation(previousOperator, actionKey, answer, convertNumber) {
         displayMini.innerHTML = `${convertNumber} ${operatorList[actionKey]}`;
         answer = convertNumber;
     }
-    return answer;
+    display.innerHTML = answer;
+    strNumber = '';
 }
 
-
-
 //equals handling
-function equalEdgeCases(previousOperator, actionKey){
+function equalsEdgeCases(previousOperator, actionKey){
     const displayNumber = parseFloat(display.innerHTML);
     (actionKey === "calculate") ? (
-            anotherEqualsInputs(previousOperator, displayNumber)
+            anotherEqualsInput(previousOperator, displayNumber)
         ):(
             displayMini.innerHTML = `${displayNumber} ${operatorList[actionKey]}`
         );
@@ -159,7 +167,7 @@ function equalEdgeCases(previousOperator, actionKey){
     display.innerHTML = answer;
 }
 
-function anotherEqualsInputs(previousOperator, displayNumber){
+function anotherEqualsInput(previousOperator, displayNumber){
     (previousOperator!=="calculate") ? (
 
         displayMini.innerHTML = `${displayNumber} ${operatorList[operationBeforeCalculate]} ${displayNumber}`,
