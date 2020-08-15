@@ -16,95 +16,61 @@ let operationBeforeCalculate = "";
 let globalConvertNumber= null;
 
 keys.forEach(key=> {
-    key.addEventListener('click', function(event){
-        const actionKey = event.target.dataset.action;
-        const operationOrExcuteKey = event.target.className;
-        if (!actionKey || actionKey === "decimal"){
-
-            calculator.querySelector("button[data-action= 'clear']").innerHTML = "CE";
-            strNumber = strNumber.concat(event.target.innerHTML);
-
-            // 0 typo handling (edge case)
-            if(strNumber === ".") strNumber = "0.";
-            if (!Number(strNumber) && Number(strNumber) !== 0 || strNumber[0] === "0" && strNumber[1] !== ".") {
-                //clearOrError(false);
-                strNumber = parseFloat(strNumber).toString();
-            } 
-
-            display.innerHTML = strNumber;
-
-        } else if (actionKey === "clear") {
-            if(event.target.innerHTML==="CE"){
-                // only the current entry is deleted i.e. previous operator is still effective ... => 15 + 24 delete 24 => 15 + (new entry needed)
-                strNumber="";
-                display.innerHTML = 0;
-                event.target.innerHTML="AC";
-            }else{
-            clearOrError();
-            }
-        } else if (operationOrExcuteKey){
-            calculator.querySelector("button[data-action= 'clear']").innerHTML = "AC";
-            if(strNumber===""){
-                
-                if (previousOperator !== "calculate") {
-                     operationBeforeCalculate = previousOperator;
-                 }
-
-                if (previousOperator){
-                    const displayNumber = parseFloat(display.innerHTML);
-                    if (actionKey === "calculate"){
-                        if (previousOperator!=="calculate") {
-                            displayMini.innerHTML = `${displayNumber} ${operatorList[operationBeforeCalculate]} ${displayNumber}`;
-                            answer = operationManager(previousOperator, displayNumber, displayNumber);
-
-                        } else if (previousOperator === "calculate"){
-                            if(!operationBeforeCalculate) operationBeforeCalculate = "calculate";
-                            displayMini.innerHTML = `${displayNumber} ${operatorList[operationBeforeCalculate]} ${globalConvertNumber}`;
-                            answer = operationManager(operationBeforeCalculate, displayNumber, globalConvertNumber);
-                        }
-
-                    } else {
-                        displayMini.innerHTML = `${displayNumber} ${operatorList[actionKey]}`;
-                    }
-
-                    display.innerHTML = answer;
-
-                }
-                previousOperator = actionKey;
-            } else {
-
-                const convertNumber = parseFloat(strNumber);
-                globalConvertNumber = convertNumber;
-
-                if (previousOperator) {
-
-                    if(previousOperator==="calculate"){
-                        displayMini.innerHTML = `${convertNumber} ${operatorList[actionKey]}`;
-                    }else{
-                        console.log("checking edge cases");
-                        displayMini.innerHTML = `${answer} ${operatorList[previousOperator]} ${convertNumber}`;
-                    }
-                    answer = operationManager(previousOperator, answer, convertNumber);
-
-                } else {
-                    displayMini.innerHTML = `${convertNumber} ${operatorList[actionKey]}`;
-                    answer = convertNumber;
-                }
-
-                display.innerHTML = answer;
-                strNumber = '';
-                operationBeforeCalculate = previousOperator;
-                previousOperator = actionKey;
-
-            }
-        }
-    });
+    key.addEventListener('click', eventHandler);
 });
 
+function eventHandler(event){
 
+    const actionKey = event.target.dataset.action;
+    const operationOrExcuteKey = event.target.className;
+
+    if (!actionKey || actionKey === "decimal") {
+        //  Click on any number key (incl. decimal key) the AC button changes to CE.
+        calculator.querySelector("button[data-action= 'clear']").innerHTML = "CE";
+        numberManager(event.target.innerHTML);
+
+    } else if (actionKey === "clear") {
+        ceAcManager(event.target.innerHTML);
+
+    } else if (operationOrExcuteKey) {
+        calculator.querySelector("button[data-action= 'clear']").innerHTML = "AC";
+        totalOperation(actionKey);
+
+    } else {
+        clearOrError(false);
+    }
+}
+
+
+
+// numbers section
+function numberManager(input){
+    calculator.querySelector("button[data-action= 'clear']").innerHTML = "CE";
+    strNumber = strNumber.concat(input);
+    
+    // 0 typo handling (edge case)
+    (strNumber === ".") && (strNumber = "0.");
+    if (!Number(strNumber) && Number(strNumber) !== 0 || strNumber[0] === "0" && strNumber[1] !== ".") {
+        //clearOrError(false);
+        strNumber = parseFloat(strNumber).toString();
+    }
+    display.innerHTML = strNumber;
+}
+
+//AC/CE section
+function ceAcManager(CEorAC){
+    (CEorAC === "CE") ? (
+        // only the current entry is deleted i.e. previous operator is still effective ... => 15 + 24 delete 24 => 15 + (new entry needed)
+        strNumber = "",
+        display.innerHTML = 0,
+        CEorAC = "AC"
+    ):(
+        clearOrError()
+    );
+}
 
 function clearOrError(clear=true){
-    clear ? display.innerHTML = 0 : display.innerHTML = "err";
+    display.innerHTML = clear ? 0 : "err";
     displayMini.innerHTML = "Display Previous Entry";
     answer = null;
     strNumber = "";
@@ -114,7 +80,34 @@ function clearOrError(clear=true){
     globalConvertNumber = null;
 }
 
-function operationManager(previousOperator, answer, convertNumber){
+//Operators section
+//Overall Operation (handle every mathematical operations)
+function totalOperation(actionKey){
+    //calculator.querySelector("button[data-action= 'clear']").innerHTML = "AC";
+        if (strNumber === "") {
+
+            (previousOperator !== "calculate") && (operationBeforeCalculate = previousOperator);
+            (previousOperator) && equalEdgeCases(previousOperator, actionKey);
+            previousOperator = actionKey;
+
+        } else {
+
+            const convertNumber = parseFloat(strNumber);
+            globalConvertNumber = convertNumber;
+            //standard mathematical operation
+            answer = standardOperation(previousOperator, actionKey, answer, convertNumber);
+            display.innerHTML = answer;
+            strNumber = '';
+            operationBeforeCalculate = previousOperator;
+            previousOperator = actionKey;
+
+        }
+};
+
+
+
+//standard methamtical operation
+function operationManager(previousOperator, answer, convertNumber) {
     switch (previousOperator) {
         case "add":
             return answer + convertNumber;
@@ -124,12 +117,63 @@ function operationManager(previousOperator, answer, convertNumber){
             return answer * convertNumber;
         case "divide":
             return answer / convertNumber;
-        case "calculate": 
-        if(convertNumber){
-            return convertNumber;
+        case "calculate":
+            if (convertNumber) {
+                return convertNumber;
             }
             return answer;
         default:
             clearOrError(false);
     }
 }
+
+function standardOperation(previousOperator, actionKey, answer, convertNumber) {
+    if (previousOperator) {
+
+        displayMini.innerHTML = (previousOperator !== "calculate") ? (
+            `${answer} ${operatorList[previousOperator]} ${convertNumber}`
+        ) : (
+            `${convertNumber} ${operatorList[actionKey]}`
+        );
+        answer = operationManager(previousOperator, answer, convertNumber);
+
+    } else {
+
+        displayMini.innerHTML = `${convertNumber} ${operatorList[actionKey]}`;
+        answer = convertNumber;
+    }
+    return answer;
+}
+
+
+
+//equals handling
+function equalEdgeCases(previousOperator, actionKey){
+    const displayNumber = parseFloat(display.innerHTML);
+    (actionKey === "calculate") ? (
+            anotherEqualsInputs(previousOperator, displayNumber)
+        ):(
+            displayMini.innerHTML = `${displayNumber} ${operatorList[actionKey]}`
+        );
+
+    display.innerHTML = answer;
+}
+
+function anotherEqualsInputs(previousOperator, displayNumber){
+    (previousOperator!=="calculate") ? (
+
+        displayMini.innerHTML = `${displayNumber} ${operatorList[operationBeforeCalculate]} ${displayNumber}`,
+        answer = operationManager(previousOperator, displayNumber, displayNumber)
+    ):(
+        (!operationBeforeCalculate) && (operationBeforeCalculate = "calculate"),
+
+        //handling the case: initial input followed by =
+        displayMini.innerHTML = (operationBeforeCalculate === "calculate") ? (
+            `${displayNumber} ${operatorList[operationBeforeCalculate]}`
+        ):(
+            `${displayNumber} ${operatorList[operationBeforeCalculate]} ${globalConvertNumber}`
+        ),
+        answer = operationManager(operationBeforeCalculate, displayNumber, globalConvertNumber)
+    );
+};
+
