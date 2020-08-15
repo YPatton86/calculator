@@ -137,6 +137,14 @@ body {
     overflow: hidden;
 }
 
+.calculator__display_mini {
+    background-color: #333333;
+    color: #999999;
+    font-size: 1 em;
+    padding: 0.2em 0.35em;
+    text-align: right;
+}
+
 .calculator__display {
     background-color: #222222;
     color: #fff;

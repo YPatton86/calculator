@@ -1,77 +1,99 @@
 const calculator = document.querySelector('.calculator');
 const keys = calculator.querySelectorAll("button");
-//const key = calculator.querySelector("button");
 const display = calculator.querySelector(".calculator__display");
+const displayMini = calculator.querySelector(".calculator__display_mini");
+
+const operators = [...calculator.querySelectorAll(".key--operator"), ...calculator.querySelectorAll(".key--equal")];
+const operatorList = {};
+operators.forEach(operator =>operatorList[operator.dataset.action] = operator.innerHTML);
+
 
 let answer = null;
 let strNumber ="";
 let previousOperator = "";
-//let operationBeforeCalculate = "";
+//may not use
+let operationBeforeCalculate = "";
+let globalConvertNumber= null;
+
 keys.forEach(key=> {
     key.addEventListener('click', function(event){
         const actionKey = event.target.dataset.action;
         const operationOrExcuteKey = event.target.className;
         if (!actionKey || actionKey === "decimal"){
 
+            calculator.querySelector("button[data-action= 'clear']").innerHTML = "CE";
             strNumber = strNumber.concat(event.target.innerHTML);
-            if(strNumber === "."){
-                strNumber = "0.";
-            }
 
-            if (!Number(strNumber) && Number(strNumber) !== 0) {
-                //error();
+            // 0 typo handling (edge case)
+            if(strNumber === ".") strNumber = "0.";
+            if (!Number(strNumber) && Number(strNumber) !== 0 || strNumber[0] === "0" && strNumber[1] !== ".") {
+                //clearOrError(false);
                 strNumber = parseFloat(strNumber).toString();
-                calculator.querySelector("button[data-action= 'clear']").innerHTML ="CE";
-            } else if (strNumber[0] === "0" && strNumber[1]!=="."){
-                // any number start with 0 but not followed by . will omit the 0 at the front. i.e. 012345=>12345
-                strNumber = parseFloat(strNumber).toString();
-                display.innerHTML = strNumber;
-                calculator.querySelector("button[data-action= 'clear']").innerHTML = "AC";
-            } else {
-                display.innerHTML = strNumber;
-                calculator.querySelector("button[data-action= 'clear']").innerHTML = "AC";
-            }
+            } 
+
+            display.innerHTML = strNumber;
 
         } else if (actionKey === "clear") {
             if(event.target.innerHTML==="CE"){
+                // only the current entry is deleted i.e. previous operator is still effective ... => 15 + 24 delete 24 => 15 + (new entry needed)
                 strNumber="";
-                if(answer){
-                display.innerHTML = answer;
-                } else {
                 display.innerHTML = 0;
-                }
-                console.log(answer);
                 event.target.innerHTML="AC";
             }else{
-            clear();
+            clearOrError();
             }
         } else if (operationOrExcuteKey){
-            //console.log(strNumber)
+            calculator.querySelector("button[data-action= 'clear']").innerHTML = "AC";
             if(strNumber===""){
+                
+                if (previousOperator !== "calculate") {
+                     operationBeforeCalculate = previousOperator;
+                 }
 
-                // if (previousOperator !== "calculate") {
-                //     operationBeforeCalculate = previousOperator;
-                // }
-                if (previousOperator && actionKey === "calculate") {
+                if (previousOperator){
                     const displayNumber = parseFloat(display.innerHTML);
-                    answer = operationManager(previousOperator, displayNumber, displayNumber);
-                    display.innerHTML = answer;
-                } 
-                previousOperator = actionKey;
+                    if (actionKey === "calculate"){
+                        if (previousOperator!=="calculate") {
+                            displayMini.innerHTML = `${displayNumber} ${operatorList[operationBeforeCalculate]} ${displayNumber}`;
+                            answer = operationManager(previousOperator, displayNumber, displayNumber);
 
+                        } else if (previousOperator === "calculate"){
+                            if(!operationBeforeCalculate) operationBeforeCalculate = "calculate";
+                            displayMini.innerHTML = `${displayNumber} ${operatorList[operationBeforeCalculate]} ${globalConvertNumber}`;
+                            answer = operationManager(operationBeforeCalculate, displayNumber, globalConvertNumber);
+                        }
+
+                    } else {
+                        displayMini.innerHTML = `${displayNumber} ${operatorList[actionKey]}`;
+                    }
+
+                    display.innerHTML = answer;
+
+                }
+                previousOperator = actionKey;
             } else {
 
                 const convertNumber = parseFloat(strNumber);
+                globalConvertNumber = convertNumber;
 
                 if (previousOperator) {
-                    answer = operationManager(previousOperator, answer, convertNumber);
-                    display.innerHTML = answer;
-                } else {
 
+                    if(previousOperator==="calculate"){
+                        displayMini.innerHTML = `${convertNumber} ${operatorList[actionKey]}`;
+                    }else{
+                        console.log("checking edge cases");
+                        displayMini.innerHTML = `${answer} ${operatorList[previousOperator]} ${convertNumber}`;
+                    }
+                    answer = operationManager(previousOperator, answer, convertNumber);
+
+                } else {
+                    displayMini.innerHTML = `${convertNumber} ${operatorList[actionKey]}`;
                     answer = convertNumber;
                 }
 
+                display.innerHTML = answer;
                 strNumber = '';
+                operationBeforeCalculate = previousOperator;
                 previousOperator = actionKey;
 
             }
@@ -79,18 +101,17 @@ keys.forEach(key=> {
     });
 });
 
-function clear(){
-    display.innerHTML = 0;
-    answer = null;
-    strNumber='';
-    previousOperator = "";
-}
 
-function error(){
-    display.innerHTML = "err";
+
+function clearOrError(clear=true){
+    clear ? display.innerHTML = 0 : display.innerHTML = "err";
+    displayMini.innerHTML = "Display Previous Entry";
     answer = null;
     strNumber = "";
     previousOperator = "";
+    // may not use
+    operationBeforeCalculate = "";
+    globalConvertNumber = null;
 }
 
 function operationManager(previousOperator, answer, convertNumber){
@@ -109,6 +130,6 @@ function operationManager(previousOperator, answer, convertNumber){
             }
             return answer;
         default:
-            error();
+            clearOrError(false);
     }
 }
