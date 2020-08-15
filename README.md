@@ -52,6 +52,7 @@ e.g.
 00.1245 => 0.12345
 .123 => 0.123
 
-Operator key if you hit any operator key one by another, the last operator key will be applied for the calculation
+Operator key:
+If you hit any operator key one after the other, the last operator key will be applied for the calculation
 
 e.g. if you hit 5 + - / x then the last operation will be applied to the calculation, i.e., 5 x
