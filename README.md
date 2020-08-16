@@ -11,7 +11,6 @@ Additional Features
 Display the previous entry:
 It shows the equation, and current input
 
-
 CE option:
 
     Click on any number key (incl. decimal key) the AC button changes to CE.
@@ -56,3 +55,6 @@ Operator key:
 If you hit any operator key one after the other, the last operator key will be applied for the calculation
 
 e.g. if you hit 5 + - / x then the last operation will be applied to the calculation, i.e., 5 x
+
+Now, you cab press number keys!
+Use Delete key for AC/CE

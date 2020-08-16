@@ -179,15 +179,31 @@ function eventHandler(event){
     }
 };
 
-//document.addEventListener('keypress', eventHandlerKeydown);
-// function eventHandlerKeydown(event){
-//     const keyClicked= event.key;
-//     //const actionKey = .dataset.action.innerHTML;
-//     //const operationOrExcuteKey = event.target.className;
-//     console.log(keyCicked);
-//     if(actionKey==keyClicked) {
-//     console.log(actionKey);
-//     }
-// }
+const operatorKeys = new Map([
+    ["+", "add"],
+    ["-", "subtract"],
+    ["*", "multiply"],
+    ["/", "divide"],
+    ["Enter", "calculate"],
+    ["Delete", "clear"]
+]);
+
+document.addEventListener('keydown', eventHandlerKeydown);
+
+function eventHandlerKeydown(event) {
+    const keyClicked = event.key;
+    console.log(keyClicked);
+    keys.forEach(key => {
+        if (key.dataset.action && operatorKeys.get(keyClicked) && key.dataset.action === operatorKeys.get(keyClicked)) {
+            //console.log("matched", key.dataset.action, operatorKeys.get(keyClicked));
+            key.click();
+        } else if (keyClicked === key.innerHTML) {
+            //console.log("matched", key.innerHTML, keyClicked);
+            key.click();        
+        };
+
+    });
+}
+
 
 
