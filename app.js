@@ -192,7 +192,6 @@ document.addEventListener('keydown', eventHandlerKeydown);
 
 function eventHandlerKeydown(event) {
     const keyClicked = event.key;
-    console.log(keyClicked);
     keys.forEach(key => {
         if (key.dataset.action && operatorKeys.get(keyClicked) && key.dataset.action === operatorKeys.get(keyClicked)) {
             //console.log("matched", key.dataset.action, operatorKeys.get(keyClicked));
