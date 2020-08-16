@@ -17,7 +17,7 @@ class calculatorFunction {
     }
 
     numberManager(input) {
-        calculator.querySelector("button[data-action= 'clear']").innerHTML = "CE";
+        //calculator.querySelector("button[data-action= 'clear']").innerHTML = "CE";
         this.strNumber = this.strNumber.concat(input);
 
         // 0 typo handling (edge case)
@@ -56,10 +56,11 @@ class calculatorFunction {
         //calculator.querySelector("button[data-action= 'clear']").innerHTML = "AC";
         if (this.strNumber === "") {
             // when +-/x was inserted first after a reset
-            (!this.previousOperator) && (displayMini.innerHTML = `${display.innerHTML} ${operatorList[actionKey]}`);
-            // console.log("I'm here!");
-            (this.previousOperator !== "calculate") && (this.operationBeforeCalculate = this.previousOperator);
-            (this.previousOperator) && this.equalsEdgeCases(actionKey);
+            (!(this.answer && this.previousOperator && this.operationBeforeCalculate && this.globalConvertNumber)) 
+            && (displayMini.innerHTML = `${display.innerHTML} ${operatorList[actionKey]}`);
+            const displayNumber = parseFloat(display.innerHTML);
+            (this.previousOperator !== "calculate") && (this.operationBeforeCalculate = this.previousOperator, this.globalConvertNumber = parseFloat(display.innerHTML));
+            (this.previousOperator) && this.equalsEdgeCases(actionKey, displayNumber);
             this.previousOperator = actionKey;
 
         } else {
@@ -104,6 +105,7 @@ class calculatorFunction {
             ) : (
                 `${convertNumber} ${operatorList[actionKey]}`
             );
+
             this.answer = this.operationManager(this.previousOperator, this.answer, convertNumber);
 
         } else {
@@ -116,8 +118,9 @@ class calculatorFunction {
     }
 
     //equals handling
-    equalsEdgeCases(actionKey) {
-        const displayNumber = parseFloat(display.innerHTML);
+    equalsEdgeCases(actionKey, displayNumber) {
+
+ 
         (actionKey === "calculate") ? (
             this.anotherEqualsInput(displayNumber)
         ) : (
@@ -128,9 +131,10 @@ class calculatorFunction {
     }
 
     anotherEqualsInput(displayNumber) {
-        (this.previousOperator !== "calculate") ? (
 
+        (this.previousOperator !== "calculate") ? (
             displayMini.innerHTML = `${displayNumber} ${operatorList[this.operationBeforeCalculate]} ${displayNumber}`,
+            this.answer = displayNumber,
             this.answer = this.operationManager(this.previousOperator, displayNumber, displayNumber)
         ) : (
             (!this.operationBeforeCalculate) && (this.operationBeforeCalculate = "calculate"),
@@ -160,7 +164,7 @@ function eventHandler(event){
 
     if (!actionKey || actionKey === "decimal") {
         //  Click on any number key (incl. decimal key) the AC button changes to CE.
-        //calculator.querySelector("button[data-action= 'clear']").innerHTML = "CE";
+        calculator.querySelector("button[data-action= 'clear']").innerHTML = "CE";
         clickCalculator.numberManager(event.target.innerHTML);
 
     } else if (actionKey === "clear") {
