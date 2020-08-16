@@ -30,11 +30,11 @@ class calculatorFunction {
     }
 
     ceAcManager(CEorAC) {
-        (CEorAC === "CE") ? (
+        (CEorAC.innerHTML === "CE") ? (
             // only the current entry is deleted i.e. previous operator is still effective ... => 15 + 24 delete 24 => 15 + (new entry needed)
             this.strNumber = "",
             display.innerHTML = 0,
-            CEorAC = "AC"
+            CEorAC.innerHTML = "AC"
         ) : (
             this.clearOrError()
         );
@@ -168,7 +168,7 @@ function eventHandler(event){
         clickCalculator.numberManager(event.target.innerHTML);
 
     } else if (actionKey === "clear") {
-        clickCalculator.ceAcManager(event.target.innerHTML);
+        clickCalculator.ceAcManager(event.target);
 
     } else if (operationOrExcuteKey) {
         calculator.querySelector("button[data-action= 'clear']").innerHTML = "AC";
@@ -196,11 +196,14 @@ function eventHandlerKeydown(event) {
         if (key.dataset.action && operatorKeys.get(keyClicked) && key.dataset.action === operatorKeys.get(keyClicked)) {
             //console.log("matched", key.dataset.action, operatorKeys.get(keyClicked));
             key.click();
+            key.classList.add("keyPressed");
+            setTimeout(() => key.classList.remove("keyPressed"), 100);
         } else if (keyClicked === key.innerHTML) {
             //console.log("matched", key.innerHTML, keyClicked);
-            key.click();        
+            key.click();  
+            key.classList.add("keyPressed");
+            setTimeout(() => key.classList.remove("keyPressed"), 100);
         };
-
     });
 }
 

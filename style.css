@@ -181,6 +181,14 @@ body {
     z-index: 1;
 }
 
+.keyPressed {
+    background-color: #eee;
+    box-shadow: 0 0 6px 0 rgba(0, 0, 0, 0.2) inset;
+    content: "";
+    opacity: 0.9;
+    z-index: 2;
+}
+
 .key--operator {
     background-color: #eee;
 }
