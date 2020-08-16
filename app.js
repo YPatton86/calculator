@@ -5,7 +5,7 @@ const displayMini = calculator.querySelector(".calculator__display_mini");
 
 const operators = [...calculator.querySelectorAll(".key--operator"), ...calculator.querySelectorAll(".key--equal")];
 const operatorList = {};
-operators.forEach(operator =>operatorList[operator.dataset.action] = operator.innerHTML);
+operators.forEach(operator => operatorList[operator.dataset.action] = operator.innerHTML);
 
 class calculatorFunction {
     constructor(){
@@ -151,6 +151,7 @@ class calculatorFunction {
 
 }
 
+
 const clickCalculator = new calculatorFunction();
 
 keys.forEach(key=> {
@@ -179,18 +180,19 @@ function eventHandler(event){
     }
 };
 
-const operatorKeys = new Map([
-    ["+", "add"],
-    ["-", "subtract"],
-    ["*", "multiply"],
-    ["/", "divide"],
-    ["Enter", "calculate"],
-    ["Delete", "clear"]
-]);
+
 
 document.addEventListener('keydown', eventHandlerKeydown);
 
 function eventHandlerKeydown(event) {
+    const operatorKeys = new Map([
+        ["+", "add"],
+        ["-", "subtract"],
+        ["*", "multiply"],
+        ["/", "divide"],
+        ["Enter", "calculate"],
+        ["Delete", "clear"]
+    ]);
     const keyClicked = event.key;
     keys.forEach(key => {
         if (key.dataset.action && operatorKeys.get(keyClicked) && key.dataset.action === operatorKeys.get(keyClicked)) {
