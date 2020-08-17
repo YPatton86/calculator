@@ -7,7 +7,7 @@ const operators = [...calculator.querySelectorAll(".key--operator"), ...calculat
 const operatorList = {};
 operators.forEach(operator => operatorList[operator.dataset.action] = operator.innerHTML);
 
-class calculatorFunction {
+class CalculatorFunction {
     constructor(){
         this.answer = 0;
         this.strNumber = "";
@@ -152,7 +152,7 @@ class calculatorFunction {
 }
 
 
-const clickCalculator = new calculatorFunction();
+const clickCalculator = new CalculatorFunction();
 
 keys.forEach(key=> {
     key.addEventListener('click', eventHandler);
@@ -179,7 +179,6 @@ function eventHandler(event){
         clickCalculator.clearOrError(false);
     }
 };
-
 
 
 document.addEventListener('keydown', eventHandlerKeydown);
