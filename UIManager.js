@@ -68,7 +68,7 @@ export default class UIManager{
     totalOperation(actionKey) {
         //calculator.querySelector("button[data-action= 'clear']").innerHTML = "AC";
         if (this.parameters.strNumber === "") {
-            //when +-/x was inserted first after a reset
+            //when +-/x is inserted first after a reset
             !(
                 this.parameters.answer &&
                 this.parameters.previousOperator &&
@@ -82,7 +82,7 @@ export default class UIManager{
             this.parameters.previousOperator !== "calculate" &&
                 ((this.parameters.operationBeforeCalculate = this.parameters.previousOperator),
                     (this.parameters.globalConvertNumber = parseFloat(this.display.innerHTML)));
-            //display
+            //Equals edge cases 
             this.parameters.previousOperator && this.equalsEdgeCases(actionKey, displayNumber);
             this.parameters.previousOperator = actionKey;
         } else {
@@ -102,32 +102,33 @@ export default class UIManager{
     standardOperation(actionKey) {
         const convertNumber = parseFloat(this.parameters.strNumber);
         this.parameters.globalConvertNumber = convertNumber;
+        
         if (this.parameters.previousOperator) {
             this.displayMini.innerHTML =
                 this.parameters.previousOperator !== "calculate" ?
                 `${this.parameters.answer} ${
-              this.operatorList[this.parameters.previousOperator]
+              this.operatorList[this.parameters.previousOperator] // n1 operator n2 e.g. number1 + number2  
             } ${convertNumber}` :
-                `${convertNumber} ${this.operatorList[actionKey]}`;
+                `${convertNumber} ${this.operatorList[actionKey]}`; // (previour Operator , =) n2 operator, e.g. number + (symbol)
 
             this.parameters.answer = operationManager(
                 this.parameters.previousOperator,
                 this.parameters.answer,
                 convertNumber
             );
-        } else {
+        } else { // no previous operator
             this.displayMini.innerHTML = `${convertNumber} ${this.operatorList[actionKey]}`;
             this.parameters.answer = convertNumber;
         }    
         this.display.innerHTML = this.parameters.answer;
         this.parameters.strNumber = "";
+        return this.parameters.answer;
     }
 
     anotherEqualsInput(displayNumber) {
         this.parameters.previousOperator !== "calculate" ?
             ((this.displayMini.innerHTML = `${displayNumber} ${
-          this.operatorList[this.parameters.operationBeforeCalculate]
-        } ${displayNumber}`),
+          this.operatorList[this.parameters.operationBeforeCalculate]} ${displayNumber}`),
                 (this.parameters.answer = displayNumber),
                 (this.parameters.answer = operationManager(
                     this.parameters.previousOperator,
@@ -139,17 +140,15 @@ export default class UIManager{
                 //handling the case: initial input followed by =
                 (this.displayMini.innerHTML =
                     this.parameters.operationBeforeCalculate === "calculate" ?
-                    `${displayNumber} ${
-                this.operatorList[this.parameters.operationBeforeCalculate]
-              }` :
-                    `${displayNumber} ${
-                this.operatorList[this.parameters.operationBeforeCalculate]
-              } ${this.parameters.globalConvertNumber}`),
+                    `${displayNumber} ${ this.operatorList[this.parameters.operationBeforeCalculate]}`
+                :`${displayNumber} ${ this.operatorList[this.parameters.operationBeforeCalculate]} ${this.parameters.globalConvertNumber}`),
                 (this.parameters.answer = operationManager(
                     this.parameters.operationBeforeCalculate,
                     displayNumber,
-                    this.parameters.globalConvertNumber
-                )));
+                    this.parameters.globalConvertNumber)
+                )
+            );
+            return this.parameters.answer;
     }
     //equals handling
     equalsEdgeCases(actionKey, displayNumber) {
@@ -158,6 +157,7 @@ export default class UIManager{
             (this.displayMini.innerHTML = `${displayNumber} ${this.operatorList[actionKey]}`);
 
         this.display.innerHTML = this.parameters.answer;
+        return this.parameters.answer;
     }
 
 }

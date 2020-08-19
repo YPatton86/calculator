@@ -2,11 +2,13 @@ import CalculatorParameters from "./calculatorParameters.js";
 import { exportAllDeclaration } from "@babel/types";
 import { exception } from "console";
 //decimal and other number edge cases, clear entry and  all clear 
+
+//let parameters;
 // beforeEach(()=>{
 //     const parameters = new CalculatorParameters();
-//     return parameters;
+
 // });
-test("Test Clear entry then All Clear, everything should be deleted", () => {
+test("Test CE then AC, everything should be deleted", () => {
     const parameters = new CalculatorParameters();
     parameters.answer = 2;
     parameters.strNumber = "232";
@@ -27,7 +29,7 @@ test("Test Clear entry then All Clear, everything should be deleted", () => {
     expect(parameters.operationBeforeCalculate).toBe("");
     expect(parameters.globalConvertNumber).toBe(0);
 });
-test("Test Clear entry then All Clear, everything should be deleted", () => {
+test("Test CE then AC, everything should be deleted", () => {
     const parameters = new CalculatorParameters();
     parameters.answer = 10;
     parameters.strNumber = "0";
@@ -49,7 +51,7 @@ test("Test Clear entry then All Clear, everything should be deleted", () => {
     expect(parameters.globalConvertNumber).toBe(0);
 });
 
-test("Decimal testing '00.120', '.120', '0.120', all should turn to be '0.120'", () =>{
+test("Decimal testing '00.120', '.120', '0.120', all should be '0.120'", () =>{
     const parameters = new CalculatorParameters();
     const array1 = ["0","0",".","1","2","0"];
     for(let i=0; i < array1.length;i++){
@@ -69,7 +71,7 @@ test("Decimal testing '00.120', '.120', '0.120', all should turn to be '0.120'",
     };
     expect(parameters.strNumber).toBe("0.120");
 });
-test("Decimal and other number edge cases, 0.12.0 => 0.120 (dismiss from the second decimal), 0012.0 => 12.0 ", () => {
+test("Decimal and other number edge cases, 0.12.0 => 0.120 (remove the second and more decimals), 0012.0 => 12.0 ", () => {
     const parameters = new CalculatorParameters();
     const array1 = ["0", ".", "1", "2",".", "0"];
     for (let i = 0; i < array1.length; i++) {
@@ -89,4 +91,3 @@ test("Decimal and other number edge cases, 0.12.0 => 0.120 (dismiss from the sec
     };
     expect(parameters.strNumber).toBe("0.120");
 });
-

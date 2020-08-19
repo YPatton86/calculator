@@ -58,3 +58,4 @@ test("equals, 6 = 6", () => {
 test("equals, 6 = 6", () => {
     expect(operationManager("calculate", "", 6)).toBe(6);
 });
+
