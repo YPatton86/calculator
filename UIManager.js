@@ -1,34 +1,30 @@
-import CalculatorParameters from './calculatorParameters.js';
-import {
-    operationManager
-} from './operationManager.js';
-
-export default class UIManager extends CalculatorParameters{
-    constructor(calculator, keys, display, displayMini, operatorList) {
-        super();
+import {operationManager} from "./operationManager.js"
+export default class UIManager{
+    constructor(calculator, keys, display, displayMini, operatorList, parameters) {
         this.calculator = calculator,
         this.keys = keys,
         this.display = display,
         this.displayMini = displayMini,
-        this.operatorList = operatorList
+        this.operatorList = operatorList,
+        this.parameters = parameters
     }
-    eventHandler(event) {
 
+    eventHandler(event) {
         const actionKey = event.target.dataset.action;
         const operationOrExcuteKey = event.target.className;
 
         if (!actionKey || actionKey === "decimal") {
             //  Click on any number key (incl. decimal key) the AC button changes to CE.
             this.calculator.querySelector("button[data-action= 'clear']").innerHTML = "CE";
-            this.display.innerHTML = super.numberManager(event.target.innerHTML);
+            this.display.innerHTML = this.parameters.numberManager(event.target.innerHTML);
 
         } else if (actionKey === "clear") {
             if (event.target.innerHTML === "CE") {
-                super.clearEntry();
+                this.parameters.clearEntry();
                 this.display.innerHTML = 0;
                 event.target.innerHTML = "AC";
             } else if (event.target.innerHTML === "AC") {
-                super.allClear();
+                this.parameters.allClear();
                 this.display.innerHTML = 0;
                 this.displayMini.innerHTML = "Display Previous Entry";
             }
@@ -37,8 +33,9 @@ export default class UIManager extends CalculatorParameters{
             this.calculator.querySelector("button[data-action= 'clear']").innerHTML = "AC";
             this.totalOperation(actionKey);
         } else {
+            //safety net just in case
             this.calculator.querySelector("button[data-action= 'clear']").innerHTML = "AC";
-            super.allClear();
+            this.parameters.allClear();
             this.display.innerHTML = "err";
             this.displayMini.innerHTML = "Display Previous Entry";
         }
@@ -70,87 +67,88 @@ export default class UIManager extends CalculatorParameters{
 
     totalOperation(actionKey) {
         //calculator.querySelector("button[data-action= 'clear']").innerHTML = "AC";
-        if (this.strNumber === "") {
+        if (this.parameters.strNumber === "") {
             //when +-/x was inserted first after a reset
             !(
-                this.answer &&
-                this.previousOperator &&
-                this.operationBeforeCalculate &&
-                this.globalConvertNumber
+                this.parameters.answer &&
+                this.parameters.previousOperator &&
+                this.parameters.operationBeforeCalculate &&
+                this.parameters.globalConvertNumber
             ) &&
             (this.displayMini.innerHTML = `${this.display.innerHTML} ${this.operatorList[actionKey]}`);
 
             const displayNumber = parseFloat(this.display.innerHTML);
 
-            this.previousOperator !== "calculate" &&
-                ((this.operationBeforeCalculate = this.previousOperator),
-                    (this.globalConvertNumber = parseFloat(this.display.innerHTML)));
+            this.parameters.previousOperator !== "calculate" &&
+                ((this.parameters.operationBeforeCalculate = this.parameters.previousOperator),
+                    (this.parameters.globalConvertNumber = parseFloat(this.display.innerHTML)));
             //display
-            this.previousOperator && this.equalsEdgeCases(actionKey, displayNumber);
-            this.previousOperator = actionKey;
+            this.parameters.previousOperator && this.equalsEdgeCases(actionKey, displayNumber);
+            this.parameters.previousOperator = actionKey;
         } else {
             //standard mathematical operation
             this.standardOperation(actionKey);
-            this.operationBeforeCalculate = this.previousOperator;
-            this.previousOperator = actionKey;
+            this.parameters.operationBeforeCalculate = this.parameters.previousOperator;
+            this.parameters.previousOperator = actionKey;
         }
-        if (this.answer === "err"){
+        if (this.parameters.answer === "err"){
+            //safety net
             this.calculator.querySelector("button[data-action= 'clear']").innerHTML = "AC";
-            super.allClear();
+            this.parameters.allClear();
             this.displayMini.innerHTML = "Display Previous Entry";
         }
     }
 
     standardOperation(actionKey) {
-        const convertNumber = parseFloat(this.strNumber);
-        this.globalConvertNumber = convertNumber;
-        if (this.previousOperator) {
+        const convertNumber = parseFloat(this.parameters.strNumber);
+        this.parameters.globalConvertNumber = convertNumber;
+        if (this.parameters.previousOperator) {
             this.displayMini.innerHTML =
-                this.previousOperator !== "calculate" ?
-                `${this.answer} ${
-              this.operatorList[this.previousOperator]
+                this.parameters.previousOperator !== "calculate" ?
+                `${this.parameters.answer} ${
+              this.operatorList[this.parameters.previousOperator]
             } ${convertNumber}` :
                 `${convertNumber} ${this.operatorList[actionKey]}`;
 
-            this.answer = operationManager(
-                this.previousOperator,
-                this.answer,
+            this.parameters.answer = operationManager(
+                this.parameters.previousOperator,
+                this.parameters.answer,
                 convertNumber
             );
         } else {
             this.displayMini.innerHTML = `${convertNumber} ${this.operatorList[actionKey]}`;
-            this.answer = convertNumber;
+            this.parameters.answer = convertNumber;
         }    
-        this.display.innerHTML = this.answer;
-        this.strNumber = "";
+        this.display.innerHTML = this.parameters.answer;
+        this.parameters.strNumber = "";
     }
 
     anotherEqualsInput(displayNumber) {
-        this.previousOperator !== "calculate" ?
+        this.parameters.previousOperator !== "calculate" ?
             ((this.displayMini.innerHTML = `${displayNumber} ${
-          this.operatorList[this.operationBeforeCalculate]
+          this.operatorList[this.parameters.operationBeforeCalculate]
         } ${displayNumber}`),
-                (this.answer = displayNumber),
-                (this.answer = operationManager(
-                    this.previousOperator,
+                (this.parameters.answer = displayNumber),
+                (this.parameters.answer = operationManager(
+                    this.parameters.previousOperator,
                     displayNumber,
                     displayNumber
                 ))) :
-            (!this.operationBeforeCalculate &&
-                (this.operationBeforeCalculate = "calculate"),
+            (!this.parameters.operationBeforeCalculate &&
+                (this.parameters.operationBeforeCalculate = "calculate"),
                 //handling the case: initial input followed by =
                 (this.displayMini.innerHTML =
-                    this.operationBeforeCalculate === "calculate" ?
+                    this.parameters.operationBeforeCalculate === "calculate" ?
                     `${displayNumber} ${
-                this.operatorList[this.operationBeforeCalculate]
+                this.operatorList[this.parameters.operationBeforeCalculate]
               }` :
                     `${displayNumber} ${
-                this.operatorList[this.operationBeforeCalculate]
-              } ${this.globalConvertNumber}`),
-                (this.answer = operationManager(
-                    this.operationBeforeCalculate,
+                this.operatorList[this.parameters.operationBeforeCalculate]
+              } ${this.parameters.globalConvertNumber}`),
+                (this.parameters.answer = operationManager(
+                    this.parameters.operationBeforeCalculate,
                     displayNumber,
-                    this.globalConvertNumber
+                    this.parameters.globalConvertNumber
                 )));
     }
     //equals handling
@@ -159,7 +157,7 @@ export default class UIManager extends CalculatorParameters{
             this.anotherEqualsInput(displayNumber) :
             (this.displayMini.innerHTML = `${displayNumber} ${this.operatorList[actionKey]}`);
 
-        this.display.innerHTML =this.answer;
+        this.display.innerHTML = this.parameters.answer;
     }
 
 }

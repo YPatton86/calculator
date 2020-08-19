@@ -10,7 +10,7 @@ export function operationManager(prevOp, ans, convertNum) {
         case "divide":
             return ans / convertNum;
         case "calculate":
-            if (convertNum) {
+            if (convertNum || convertNum === 0) {
                 return convertNum;
             }
             return ans;

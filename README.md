@@ -58,3 +58,5 @@ e.g. if you hit 5 + - / x then the last operation will be applied to the calcula
 
 Now, you cab press number keys!
 Use Delete key for AC/CE
+
+// Please look at operationManger.test.js and calculatorParameters.test.js for jest testing. 
