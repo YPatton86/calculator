@@ -1,3 +1,5 @@
+Click the buttons on the screen or press number keys on the keyboard (Use Delete key for AC/CE)!
+
 - Display the current value on the calculator input.
 
 - Perform basic mathematical operations when clicked (+ - x /).
@@ -55,6 +57,3 @@ Operator key:
 If you hit any operator key one after the other, the last operator key will be applied for the calculation
 
 e.g. if you hit 5 + - / x then the last operation will be applied to the calculation, i.e., 5 x
-
-Now, you can press number keys!
-Use Delete key for AC/CE
