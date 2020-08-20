@@ -97,6 +97,7 @@ export default class UIManager{
             this.parameters.allClear();
             this.displayMini.innerHTML = "Display Previous Entry";
         }
+        return this.parameters.answer;
     }
 
     standardOperation(actionKey) {
