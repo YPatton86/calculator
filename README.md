@@ -56,5 +56,5 @@ If you hit any operator key one after the other, the last operator key will be a
 
 e.g. if you hit 5 + - / x then the last operation will be applied to the calculation, i.e., 5 x
 
-Now, you cab press number keys!
+Now, you can press number keys!
 Use Delete key for AC/CE
