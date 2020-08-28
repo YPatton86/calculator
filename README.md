@@ -19,7 +19,7 @@ CE option:
 
     after clear entry with CE it will go back to AC then you can click on AC to clear the
 
-    CE clears and go back to the previous entry or 0 if no previous entry.
+    CE clears and goes back to the previous entry or 0 if no previous entry.
     e.g.
     15 + 24, then delete 24 with CE then 15 will be displayed.
 
