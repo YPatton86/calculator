@@ -91,3 +91,4 @@ test("Decimal and other number edge cases, 0.12.0 => 0.120 (remove the second an
     };
     expect(parameters.strNumber).toBe("0.120");
 });
+

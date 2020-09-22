@@ -1,4 +1,5 @@
 import UIManager from "./UIManager.js";
+import CalculatorParameters from "./calculatorParameters.js";
 import { JestEnvironment } from "@jest/environment";
 import { jsxEmptyExpression, exportAllDeclaration } from "@babel/types";
 import JestMock from "jest-mock";
@@ -25,9 +26,56 @@ beforeEach(()=>{
     const operators = [...calculator.querySelectorAll(".key--operator"), ...calculator.querySelectorAll(".key--equal")];
     operatorList = {};
     operators.forEach(operator => operatorList[operator.dataset.action] = operator.innerHTML);
-
 });
 
+// test eventHandler
+test('utils testing 1+23 = 24 (standard calculation)', () => {
+        const parameters = {
+            answer: 1,
+            strNumber: "23",
+            previousOperator: "add",
+            operationBeforeCalculate: "",
+            globalConvertNumber: 1
+        }
+        const calculatorUI = new UIManager(calculator, keys, display, displayMini, operatorList, parameters);
+        const clickedbutton = calculator.querySelector("button[data-action= 'calculate']");
+        const actionKey = clickedbutton.dataset.action;
+        const operationOrExcuteKey = clickedbutton.className;
+        const UIdisplay = "=";
+        calculatorUI.utils(actionKey, operationOrExcuteKey, UIdisplay);
+        expect(calculatorUI.display.innerHTML).toMatch("24");
+        expect(calculatorUI.displayMini.innerHTML).toMatch("1 + 23");
+});
+test('utils testing 23 (string input)', () => {
+    const parameters = new CalculatorParameters();
+    parameters.answer = 0;
+    parameters.strNumber = "2";
+    parameters.previousOperator = "";
+    parameters.operationBeforeCalculate = "";
+    parameters.globalConvertNumber = 0;
+    const calculatorUI = new UIManager(calculator, keys, display, displayMini, operatorList, parameters);
+    const actionKey = "";
+    const operationOrExcuteKey = "";
+    const UIdisplay = "3";
+    calculatorUI.utils(actionKey, operationOrExcuteKey, UIdisplay);
+    expect(calculatorUI.display.innerHTML).toMatch("23");
+    expect(calculatorUI.displayMini.innerHTML).toMatch("Display Previous Entry");
+});
+test('utils All Clear ', () => {
+    const parameters = new CalculatorParameters();
+    parameters.answer = 32;
+    parameters.strNumber = "2";
+    parameters.previousOperator = "add";
+    parameters.operationBeforeCalculate = "multiply";
+    parameters.globalConvertNumber = 32;
+    const calculatorUI = new UIManager(calculator, keys, display, displayMini, operatorList, parameters);
+    const actionKey = "clear";
+    const operationOrExcuteKey = "";
+    const UIdisplay = "AC";
+    calculatorUI.utils(actionKey, operationOrExcuteKey, UIdisplay);
+    expect(calculatorUI.display.innerHTML).toMatch("0");
+    expect(calculatorUI.displayMini.innerHTML).toMatch("Display Previous Entry");
+});
 
 //Total peration 2 patterns  1+23 = 24, 23 +,
 test('Total Operation i.e. 1+23 = 24 ', () => {
@@ -217,3 +265,4 @@ test('anotherEqualsInput, initial input followed by =, 23 = =  ', () => {
     expect(calculatorUI.anotherEqualsInput(23)).toBe(23);
     expect(calculatorUI.displayMini.innerHTML).toMatch("23 =");
 });
+

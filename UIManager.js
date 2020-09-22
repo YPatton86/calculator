@@ -12,33 +12,8 @@ export default class UIManager{
     eventHandler(event) {
         const actionKey = event.target.dataset.action;
         const operationOrExcuteKey = event.target.className;
-
-        if (!actionKey || actionKey === "decimal") {
-            //  Click on any number key (incl. decimal key) the AC button changes to CE.
-            this.calculator.querySelector("button[data-action= 'clear']").innerHTML = "CE";
-            this.display.innerHTML = this.parameters.numberManager(event.target.innerHTML);
-
-        } else if (actionKey === "clear") {
-            if (event.target.innerHTML === "CE") {
-                this.parameters.clearEntry();
-                this.display.innerHTML = 0;
-                event.target.innerHTML = "AC";
-            } else if (event.target.innerHTML === "AC") {
-                this.parameters.allClear();
-                this.display.innerHTML = 0;
-                this.displayMini.innerHTML = "Display Previous Entry";
-            }
-
-        } else if (operationOrExcuteKey) {
-            this.calculator.querySelector("button[data-action= 'clear']").innerHTML = "AC";
-            this.totalOperation(actionKey);
-        } else {
-            //safety net just in case
-            this.calculator.querySelector("button[data-action= 'clear']").innerHTML = "AC";
-            this.parameters.allClear();
-            this.display.innerHTML = "err";
-            this.displayMini.innerHTML = "Display Previous Entry";
-        }
+        const UIdisplay = event.target.innerHTML;
+        this.utils(actionKey, operationOrExcuteKey, UIdisplay);
     };
     eventHandlerKeydown(event) {
         const operatorKeys = new Map([
@@ -63,6 +38,35 @@ export default class UIManager{
                 setTimeout(() => key.classList.remove("keyPressed"), 100);
             };
         });
+    }
+    //experimenting
+    utils(actionKey, operationOrExcuteKey, UIdisplay){  
+        if (!actionKey || actionKey === "decimal") {
+            //  Click on any number key (incl. decimal key) the AC button changes to CE.
+            this.calculator.querySelector("button[data-action= 'clear']").innerHTML = "CE";
+            this.display.innerHTML = this.parameters.numberManager(UIdisplay);
+
+        } else if (actionKey === "clear") {
+            if (UIdisplay === "CE") {
+                this.parameters.clearEntry();
+                this.display.innerHTML = 0;
+                this.calculator.querySelector("button[data-action= 'clear']").innerHTML = "AC";
+            } else if (UIdisplay === "AC") {
+                this.parameters.allClear();
+                this.display.innerHTML = 0;
+                this.displayMini.innerHTML = "Display Previous Entry";
+            }
+
+        } else if (operationOrExcuteKey) {
+            this.calculator.querySelector("button[data-action= 'clear']").innerHTML = "AC";
+            this.totalOperation(actionKey);
+        } else {
+            //safety net just in case
+            this.calculator.querySelector("button[data-action= 'clear']").innerHTML = "AC";
+            this.parameters.allClear();
+            this.display.innerHTML = "err";
+            this.displayMini.innerHTML = "Display Previous Entry";
+        }
     }
 
     totalOperation(actionKey) {
